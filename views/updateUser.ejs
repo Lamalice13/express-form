@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <% if(locals.errors) { %> <%- include("partials/errors.ejs") %> <% } %>
+    <form action="/<%= user.id %>/update" method="POST">
+      <input
+        type="text"
+        name="firstName"
+        value="<%= user.firstName %>"
+        required
+      />
+      <input
+        type="text"
+        name="lastName"
+        value="<%= user.lastName %>"
+        required
+      />
+      <input
+        type="email"
+        name="email"
+        id="email"
+        value="<%= user.email %>"
+        required
+      />
+      <input type="number" name="age" id="age" value="<%= user.age %>" />
+      <input type="text" name="bio" id="bio" value="<%= user.bio %>" />
+      <button type="submit">Update User</button>
+    </form>
+    <a href="/">Back to home</a>
+  </body>
+</html>

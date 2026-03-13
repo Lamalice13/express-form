@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <% if(locals.errors) { %> <%- include("partials/errors.ejs", { errors }) %>
+    <% } %>
+    <form action="create" method="POST">
+      <label for="firstName">First Name: </label>
+      <input type="text" name="firstName" id="firstName" required />
+      <label for="lastName">Last Name: </label>
+      <input type="text" name="lastName" id="lastName" required />
+      <label for="email">Email: </label>
+      <input type="email" name="email" id="email" required />
+      <label for="age">Age: </label>
+      <input type="number" name="age" id="age" />
+      <label for="bio">Bio: </label>
+      <input type="text" name="bio" id="bio" />
+      <button type="submit">Submit</button>
+    </form>
+
+    <h2>Search for a user with his last name or email</h2>
+    <form action="/search" method="GET">
+      <% if(locals.searchErrors) { %> <%- include("partials/errors.ejs", {
+      errors: searchErrors }) %> <% }%>
+      <label for="lastName">Username</label>
+      <input type="text" name="lastName" id="lastName" />
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" />
+      <button type="submit" style="display: block">Search</button>
+    </form>
+    <hr />
+    <a href="/">Back to home</a>
+  </body>
+</html>

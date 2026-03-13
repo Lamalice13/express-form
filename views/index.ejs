@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <ul>
+      <% if (locals.users) { %> <% users.forEach(user => { %>
+      <li>
+        ID: <%= user.id %>
+        <br />
+        Name: <%= user.firstName %> <%= user.lastName %>
+        <br />
+        Email: <%=user.email %>
+        <br />
+        Age: <%= user.age %>
+        <br />
+        Bio: <%= user.bio %>
+      </li>
+      <a href="/<%= user.id %>/update">Update</a>
+
+      <form
+        action="/<%= user.id %>/delete"
+        method="POST"
+        style="display: inline"
+      >
+        <button
+          type="submit"
+          onclick="return confirm('Are you sure want to delete this user?');"
+        >
+          Delete
+        </button>
+      </form>
+
+      <% }); %> <% } %>
+    </ul>
+    <a href="/create">Create a user</a>
+  </body>
+</html>
