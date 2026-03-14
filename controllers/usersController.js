@@ -64,14 +64,21 @@ exports.usersCreatePost = [
   validateUser,
   (req, res) => {
     const errors = validationResult(req);
+    const { firstName, lastName, email, age, bio } = matchedData(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).render("createUser", {
         title: "Create user",
         errors: errors.array(),
+        users: {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
+          age: req.body.age,
+          bio: req.body.bio,
+        },
       });
     }
-    const { firstName, lastName, email, age, bio } = matchedData(req);
 
     usersStorage.addUser({ firstName, lastName, email, age, bio });
     res.redirect("/");

@@ -9,17 +9,35 @@
     <h1><%= title %></h1>
     <% if(locals.errors) { %> <%- include("partials/errors.ejs", { errors }) %>
     <% } %>
-    <form action="create" method="POST">
+    <form action="/create" method="POST">
       <label for="firstName">First Name: </label>
-      <input type="text" name="firstName" id="firstName" required />
+      <input
+        type="text"
+        name="firstName"
+        id="firstName"
+        required
+        value="<%= users.firstName %>"
+      />
       <label for="lastName">Last Name: </label>
-      <input type="text" name="lastName" id="lastName" required />
+      <input
+        type="text"
+        name="lastName"
+        id="lastName"
+        required
+        value="<%= users.lastName %>"
+      />
       <label for="email">Email: </label>
-      <input type="email" name="email" id="email" required />
+      <input
+        type="email"
+        name="email"
+        id="email"
+        required
+        value="<%= users.email %>"
+      />
       <label for="age">Age: </label>
-      <input type="number" name="age" id="age" />
+      <input type="number" name="age" id="age" value="<%= users.age %>" />
       <label for="bio">Bio: </label>
-      <input type="text" name="bio" id="bio" />
+      <input type="text" name="bio" id="bio" value="<%= users.bio %>" />
       <button type="submit">Submit</button>
     </form>
 
