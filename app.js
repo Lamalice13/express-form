@@ -3,6 +3,8 @@ const app = express();
 const path = require("node:path");
 const usersRouter = require("./routes/Users");
 
+app.use(express.static("public"));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, (err) => {
   if (err) {
