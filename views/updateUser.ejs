@@ -10,13 +10,13 @@
       <input
         type="text"
         name="firstName"
-        value="<%= user.firstName %>"
+        value="<%= user.firstname %>"
         required
       />
       <input
         type="text"
         name="lastName"
-        value="<%= user.lastName %>"
+        value="<%= user.lastname %>"
         required
       />
       <input
@@ -26,7 +26,13 @@
         value="<%= user.email %>"
         required
       />
-      <input type="number" name="age" id="age" value="<%= user.age %>" />
+      <input
+        type="date"
+        name="age"
+        id="age"
+        required
+        value="<%= user.date_of_birth.toISOString().split('T')[0] %>"
+      />
       <input type="text" name="bio" id="bio" value="<%= user.bio %>" />
       <button type="submit">Update User</button>
     </form>

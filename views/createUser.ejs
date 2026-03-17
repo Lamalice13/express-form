@@ -16,7 +16,7 @@
         name="firstName"
         id="firstName"
         required
-        value="<%= users.firstName %>"
+        value="<%= locals.users ? users.firstName : ''%>"
       />
       <label for="lastName">Last Name: </label>
       <input
@@ -24,7 +24,7 @@
         name="lastName"
         id="lastName"
         required
-        value="<%= users.lastName %>"
+        value="<%= locals.users ? users.lastName : '' %>"
       />
       <label for="email">Email: </label>
       <input
@@ -32,25 +32,26 @@
         name="email"
         id="email"
         required
-        value="<%= users.email %>"
+        value="<%= locals.users ? users.email : '' %>"
       />
       <label for="age">Age: </label>
-      <input type="number" name="age" id="age" value="<%= users.age %>" />
+      <input
+        type="date"
+        name="age"
+        id="age"
+        required
+        value="<%= locals.users ? users.age : '' %>"
+      />
       <label for="bio">Bio: </label>
-      <input type="text" name="bio" id="bio" value="<%= users.bio %>" />
+      <input
+        type="text"
+        name="bio"
+        id="bio"
+        value="<%= locals.users ? users.bio : '' %>"
+      />
       <button type="submit">Submit</button>
     </form>
 
-    <h2>Search for a user with his last name or email</h2>
-    <form action="/search" method="GET">
-      <% if(locals.searchErrors) { %> <%- include("partials/errors.ejs", {
-      errors: searchErrors }) %> <% }%>
-      <label for="lastName">Username</label>
-      <input type="text" name="lastName" id="lastName" />
-      <label for="email">Email</label>
-      <input type="email" name="email" id="email" />
-      <button type="submit" style="display: block">Search</button>
-    </form>
     <hr />
     <a href="/">Back to home</a>
   </body>

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Lamalice13/express-form#readme",
   "devDependencies": {
+    "dotenv": "^17.3.1",
     "ejs": "^5.0.1",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",

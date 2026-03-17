@@ -6,6 +6,7 @@ const {
   query,
   oneOf,
 } = require("express-validator");
+const db = require("../db/queries");
 
 const alphaErr = "must only contain letters.";
 const lengthErr = "must be between 1 and 10 characters.";
@@ -31,10 +32,18 @@ const validateUser = [
     .normalizeEmail(),
 
   body("age")
-    .optional({ values: "falsy" })
-    .isInt({ min: 18, max: 120 })
-    .toInt()
-    .withMessage(`Age must be between 18 and 120 yo.`),
+    .isISO8601()
+    .withMessage(`Date should be in date format.`)
+    .toDate()
+    .custom((value) => {
+      const today = new Date();
+      const age = today.getFullYear() - value.getFullYear();
+      if (age < 18) {
+        return false;
+      }
+      return true;
+    })
+    .withMessage("Must be 18 years old."),
 
   body("bio")
     .optional({ values: "falsy" })
@@ -47,10 +56,12 @@ exports.getUserId = (req, res, next, id) => {
   next();
 };
 
-exports.usersListGet = (req, res) => {
+exports.usersListGet = async (req, res) => {
+  const users = await db.getAllUsers();
+
   res.render("index", {
     title: "User list",
-    users: usersStorage.getUsers(),
+    users,
   });
 };
 
@@ -62,7 +73,7 @@ exports.usersCreateGet = (req, res) => {
 
 exports.usersCreatePost = [
   validateUser,
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     const { firstName, lastName, email, age, bio } = matchedData(req);
 
@@ -80,17 +91,17 @@ exports.usersCreatePost = [
       });
     }
 
-    usersStorage.addUser({ firstName, lastName, email, age, bio });
+    await db.insertUser(firstName, lastName, email, age, bio);
     res.redirect("/");
   },
 ];
 
-exports.usersUpdateGet = (req, res) => {
-  const user = usersStorage.getUser(req.userId);
+exports.usersUpdateGet = async (req, res) => {
+  const user = await db.getUserById(req.userId);
 
   res.render("updateUser", {
     title: "Update user",
-    user,
+    user: user[0],
   });
 };
 
@@ -109,19 +120,13 @@ exports.usersUpdatePost = [
     }
 
     const { firstName, lastName, email, age, bio } = matchedData(req);
-    usersStorage.updateUser(req.userId, {
-      firstName,
-      lastName,
-      email,
-      age,
-      bio,
-    });
+    db.updateUser(req.userId, firstName, lastName, email, age, bio);
     res.redirect("/");
   },
 ];
 
-exports.usersDeletePost = (req, res) => {
-  usersStorage.deleteUser(req.userId);
+exports.usersDeletePost = async (req, res) => {
+  await db.deleteUser(req.userId);
   res.redirect("/");
 };
 
@@ -141,28 +146,31 @@ exports.userSearchGet = [
   oneOf([query("lastName").notEmpty(), query("email").notEmpty()], {
     message: "At least one valid input must be filled.",
   }),
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     const data = matchedData(req);
-    let user;
+    let users;
 
     if (!errors.isEmpty()) {
-      res.render("createUser", {
-        title: "Create User",
+      const users = await db.getAllUsers();
+      res.render("index", {
+        title: "User list",
         searchErrors: errors.array(),
+        users,
+        userErr: { lastName: req.query.lastName, email: req.query.email },
       });
       return;
     }
 
     if (data.lastName) {
-      user = usersStorage.getUserIdByLastName(data.lastName);
+      users = await db.getUsersByLastName(data.lastName);
     } else {
-      user = usersStorage.getUserIdByEmail(data.email);
+      users = await db.getUsersByEmail(data.email);
     }
 
     res.render("search", {
       title: "Details",
-      user,
+      users,
     });
   },
 ];

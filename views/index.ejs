@@ -12,11 +12,12 @@
       <li>
         ID: <%= user.id %>
         <br />
-        Name: <%= user.firstName %> <%= user.lastName %>
+        Name: <%= user.firstname %> <%= user.lastname %>
         <br />
         Email: <%=user.email %>
         <br />
-        Age: <%= user.age %>
+        Age: <%= new Date(user.date_of_birth).toLocaleDateString({ day:
+        "numeric", year:"numeric", month: "long" }) %>
         <br />
         Bio: <%= user.bio %>
       </li>
@@ -34,9 +35,30 @@
           Delete
         </button>
       </form>
-
       <% }); %> <% } %>
     </ul>
     <a href="/create">Create a user</a>
+
+    <h2>Search for a user with his last name or email</h2>
+    <form action="/search" method="GET">
+      <% if(locals.searchErrors) { %> <%- include("partials/errors.ejs", {
+      errors: searchErrors }) %> <% }%>
+
+      <label for="lastName">Last name</label>
+      <input
+        type="text"
+        name="lastName"
+        id="lastName"
+        value="<%= locals.userErr ? userErr.lastName : '' %>"
+      />
+      <label for="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        value="<%= locals.userErr ? userErr.email : '' %>"
+      />
+      <button type="submit" style="display: block">Search</button>
+    </form>
   </body>
 </html>
