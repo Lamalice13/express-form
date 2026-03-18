@@ -6,8 +6,8 @@
     <title><%= title %>></title>
   </head>
   <body>
-    <% if(locals.users) { %> <% users.forEach(user => { %>
-
+    <% if(locals.users && locals.users.length > 0) { %> <% users.forEach(user =>
+    { %>
     <ul>
       <li>First name: <%= user.firstname %></li>
       <li>Last name: <%= user.lastname %></li>

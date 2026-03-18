@@ -58,7 +58,6 @@ async function getUsersByEmail(email) {
     "SELECT * FROM users WHERE email ILIKE $1",
     [email + "%"]
   );
-  console.log(rows);
   return rows;
 }
 
@@ -67,7 +66,6 @@ async function getUsersByLastName(lastName) {
     "SELECT * FROM users WHERE lastname ILIKE $1",
     [lastName + "%"]
   );
-  console.log(rows);
   return rows;
 }
 
