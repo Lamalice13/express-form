@@ -29,12 +29,6 @@ const validateUser = [
   body("email")
     .isEmail()
     .withMessage("Please enter a valid email address.")
-    .custom(async (value) => {
-      const user = await db.findUserByEmail(value);
-      if (user) {
-        throw new Error("Email already in use");
-      }
-    })
     .normalizeEmail(),
 
   body("age")
@@ -78,6 +72,12 @@ exports.usersCreateGet = (req, res) => {
 
 exports.usersCreatePost = [
   validateUser,
+  body("email").custom(async (value) => {
+    const user = await db.findUserByEmail(value);
+    if (user) {
+      throw new Error("Email already in use");
+    }
+  }),
   async (req, res) => {
     const errors = validationResult(req);
     const { firstName, lastName, email, age, bio } = matchedData(req);
@@ -112,20 +112,27 @@ exports.usersUpdateGet = async (req, res) => {
 
 exports.usersUpdatePost = [
   validateUser,
-  (req, res) => {
-    const user = usersStorage.getUser(req.userId);
+  body("email").custom(async (value, { req }) => {
+    const user = await db.getUsersByEmail(value);
+    console.log(user);
+    if (user && user[0].id != req.userId) {
+      throw new Error("Email already in use");
+    }
+  }),
+  async (req, res) => {
+    const user = await db.getUserById(req.userId);
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(400).render("updateUser", {
         title: "Update user",
-        user: user,
+        user: user[0],
         errors: errors.array(),
       });
     }
 
     const { firstName, lastName, email, age, bio } = matchedData(req);
-    db.updateUser(req.userId, firstName, lastName, email, age, bio);
+    await db.updateUser(req.userId, firstName, lastName, email, age, bio);
     res.redirect("/");
   },
 ];
