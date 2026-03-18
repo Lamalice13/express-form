@@ -73,6 +73,13 @@ async function deleteUser(id) {
   await pool.query("DELETE FROM users WHERE id=$1", [id]);
 }
 
+async function findUserByEmail(email) {
+  const { rows } = await pool.query("SELECT * FROM users WHERE email=$1", [
+    email,
+  ]);
+  return rows;
+}
+
 module.exports = {
   getAllUsers,
   insertUser,
@@ -81,4 +88,5 @@ module.exports = {
   getUsersByEmail,
   getUsersByLastName,
   deleteUser,
+  findUserByEmail,
 };

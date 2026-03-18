@@ -29,6 +29,12 @@ const validateUser = [
   body("email")
     .isEmail()
     .withMessage("Please enter a valid email address.")
+    .custom(async (value) => {
+      const user = await db.findUserByEmail(value);
+      if (user) {
+        throw new Error("Email already in use");
+      }
+    })
     .normalizeEmail(),
 
   body("age")
@@ -39,11 +45,10 @@ const validateUser = [
       const today = new Date();
       const age = today.getFullYear() - value.getFullYear();
       if (age < 18) {
-        return false;
+        throw new Error("Must be 18 years old");
       }
       return true;
-    })
-    .withMessage("Must be 18 years old."),
+    }),
 
   body("bio")
     .optional({ values: "falsy" })
