@@ -6,9 +6,10 @@
     <title><%= title %></title>
   </head>
   <body>
+    <h1>Searched Users</h1>
     <% if(locals.users && locals.users.length > 0) { %> <% users.forEach(user =>
     { %>
-    <h1>Searched Users</h1>
+    <h3>User n°<%= user.id %></h3>
     <ul>
       <li>First name: <%= user.firstname %></li>
       <li>Last name: <%= user.lastname %></li>

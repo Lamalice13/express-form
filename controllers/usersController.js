@@ -55,13 +55,16 @@ exports.getUserId = (req, res, next, id) => {
   next();
 };
 
-exports.usersListGet = async (req, res) => {
-  const users = await db.getAllUsers();
-
-  res.render("index", {
-    title: "User list",
-    users,
-  });
+exports.usersListGet = async (req, res, next) => {
+  try {
+    const users = await db.getAllUsers();
+    res.render("index", {
+      title: "User list",
+      users,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.usersCreateGet = (req, res) => {
@@ -74,11 +77,11 @@ exports.usersCreatePost = [
   validateUser,
   body("email").custom(async (value) => {
     const user = await db.findUserByEmail(value);
-    if (user) {
+    if (user.length > 0) {
       throw new Error("Email already in use");
     }
   }),
-  async (req, res) => {
+  async (req, res, next) => {
     const errors = validationResult(req);
     const { firstName, lastName, email, age, bio } = matchedData(req);
 
@@ -95,51 +98,69 @@ exports.usersCreatePost = [
         },
       });
     }
-
-    await db.insertUser(firstName, lastName, email, age, bio);
-    res.redirect("/");
+    try {
+      await db.insertUser(firstName, lastName, email, age, bio);
+      res.redirect("/");
+    } catch (err) {
+      next(err);
+    }
   },
 ];
 
-exports.usersUpdateGet = async (req, res) => {
-  const user = await db.getUserById(req.userId);
-
-  res.render("updateUser", {
-    title: "Update user",
-    user: user[0],
-  });
+exports.usersUpdateGet = async (req, res, next) => {
+  try {
+    const user = await db.getUserById(req.userId);
+    res.render("updateUser", {
+      title: "Update user",
+      user: user[0],
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.usersUpdatePost = [
   validateUser,
-  body("email").custom(async (value, { req }) => {
+  body("email").custom(async (value, { req, res, next }) => {
     const user = await db.getUsersByEmail(value);
-    console.log(user);
-    if (user && user[0].id != req.userId) {
+
+    if (user.length > 0 && user[0].id != req.userId) {
       throw new Error("Email already in use");
     }
   }),
-  async (req, res) => {
-    const user = await db.getUserById(req.userId);
+  async (req, res, next) => {
     const errors = validationResult(req);
+    const { firstName, lastName, email, age, bio } = matchedData(req);
 
     if (!errors.isEmpty()) {
-      return res.status(400).render("updateUser", {
-        title: "Update user",
-        user: user[0],
-        errors: errors.array(),
-      });
+      try {
+        const user = await db.getUserById(req.userId);
+        return res.status(400).render("updateUser", {
+          title: "Update user",
+          user: user[0],
+          errors: errors.array(),
+        });
+      } catch (err) {
+        next(err);
+      }
     }
 
-    const { firstName, lastName, email, age, bio } = matchedData(req);
-    await db.updateUser(req.userId, firstName, lastName, email, age, bio);
-    res.redirect("/");
+    try {
+      await db.updateUser(req.userId, firstName, lastName, email, age, bio);
+      res.redirect("/");
+    } catch (err) {
+      next(err);
+    }
   },
 ];
 
-exports.usersDeletePost = async (req, res) => {
-  await db.deleteUser(req.userId);
-  res.redirect("/");
+exports.usersDeletePost = async (req, res, next) => {
+  try {
+    await db.deleteUser(req.userId);
+    res.redirect("/");
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.userSearchGet = [
@@ -158,31 +179,37 @@ exports.userSearchGet = [
   oneOf([query("lastName").notEmpty(), query("email").notEmpty()], {
     message: "At least one valid input must be filled.",
   }),
-  async (req, res) => {
+  async (req, res, next) => {
     const errors = validationResult(req);
     const data = matchedData(req);
-    let users;
 
     if (!errors.isEmpty()) {
-      const users = await db.getAllUsers();
-      res.render("index", {
-        title: "User list",
-        searchErrors: errors.array(),
+      try {
+        const users = await db.getAllUsers();
+        return res.render("index", {
+          title: "User list",
+          searchErrors: errors.array(),
+          users,
+          userErr: { lastName: req.query.lastName, email: req.query.email },
+        });
+      } catch (err) {
+        next(err);
+      }
+    }
+
+    try {
+      let users;
+      if (data.lastName) {
+        users = await db.getUsersByLastName(data.lastName);
+      } else {
+        users = await db.getUsersByEmail(data.email);
+      }
+      res.render("search", {
+        title: "Details",
         users,
-        userErr: { lastName: req.query.lastName, email: req.query.email },
       });
-      return;
+    } catch (err) {
+      next(err);
     }
-
-    if (data.lastName) {
-      users = await db.getUsersByLastName(data.lastName);
-    } else {
-      users = await db.getUsersByEmail(data.email);
-    }
-
-    res.render("search", {
-      title: "Details",
-      users,
-    });
   },
 ];
