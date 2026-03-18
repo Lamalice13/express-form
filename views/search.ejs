@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %>></title>
+    <title><%= title %></title>
   </head>
   <body>
     <% if(locals.users && locals.users.length > 0) { %> <% users.forEach(user =>
     { %>
+    <h1>Searched Users</h1>
     <ul>
       <li>First name: <%= user.firstname %></li>
       <li>Last name: <%= user.lastname %></li>
